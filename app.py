@@ -19,20 +19,17 @@ def webhook():
 
         # Verifica o tipo de evento
         eventname = data.get('eventname')
-        print(eventname)
         if eventname == r'\core\event\user_enrolment_created':
             userid = user_enrolment_created(data)
             if userid:
                 user_data = get_user_data(userid)
                 print(json.dumps(user_data, indent=4, ensure_ascii=False, sort_keys=True))
         elif eventname == r'\core\event\user_enrolment_updated':
-            enrol_update = user_enrolment_updated(data)
-            print(json.dumps(enrol_update, indent=4, ensure_ascii=False, sort_keys=True))
+            user_enrolment_updated(data)
 
         # Get course data
         courseid = data.get('courseid')
-        course_name = get_course_data(courseid)
-        print(course_name)
+        get_course_data(courseid)
 
         # Return success response
         return jsonify({'status': 'success'}), 200

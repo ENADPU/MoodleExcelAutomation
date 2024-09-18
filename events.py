@@ -26,18 +26,22 @@ def user_enrolment_created(data):
 
 def user_enrolment_updated(data):
     try:
-        userid = data.get('userid')
+        # Extract specific fields
+        studentid = data.get('relateduserid')
         courseid = data.get('courseid')
 
-        user_data = get_user_data(userid)
+        # Get user and course data
+        user_data = get_user_data(studentid)
         course_name = get_course_data(courseid)
 
-        user_fullname = user_data.get('fullname', 'Usuário não encontrado')
+        # From user data, get user fullname
+        student_fullname = user_data.get('fullname', 'Usuário não encontrado')
 
-        if userid is None or courseid is None:
-            raise ValueError(f'Missing required fields: userid={userid}, courseid={courseid}')
+        if studentid is None or courseid is None:
+            raise ValueError(f'Missing required fields: userid={studentid}, courseid={courseid}')
 
-        print(f'Inscrição do usuário {user_fullname} (ID: {userid}) no curso {course_name} (ID:{courseid}), foi atualizada.')
+        # Log the received data for debugging
+        print(f'Inscrição do estudante {student_fullname} (ID: {studentid}) no curso {course_name} (ID:{courseid}), foi atualizada.')
 
         return True
 
