@@ -1,5 +1,4 @@
-from user_data import get_user_data
-from course_data import get_course_data
+from get_data import get_user_data, get_course_data
 
 def user_enrolment_created(data):
     try:
@@ -26,25 +25,22 @@ def user_enrolment_created(data):
 
 def user_enrolment_updated(data):
     try:
-        # Extract specific fields
+        # Extrai campos específicos do evento
         studentid = data.get('relateduserid')
         courseid = data.get('courseid')
 
-        # Get user and course data
+        # Obtém os dados do estudante
         user_data = get_user_data(studentid)
-        course_name = get_course_data(courseid)
+        course_data = get_course_data(courseid)
 
-        # From user data, get user fullname
-        student_fullname = user_data.get('fullname', 'Usuário não encontrado')
-
+        # Valida os campos necessários
         if studentid is None or courseid is None:
-            raise ValueError(f'Missing required fields: userid={studentid}, courseid={courseid}')
+            raise ValueError(f'Missing required fields: studentid={studentid}, courseid={courseid}')
 
-        # Log the received data for debugging
-        print(f'Inscrição do estudante {student_fullname} (ID: {studentid}) no curso {course_name} (ID:{courseid}), foi atualizada.')
-
-        return True
+        # Log para depuração
+        print(f'Inscrição atualizada para o estudante {fullname} com ID {studentid} no curso {course_data} com ID {courseid}.')
+        return studentid
 
     except ValueError as ve:
-        print(f'ValueError: {str(ve)}')
-        return False
+        print(f'Erro ao processar dados do webhook: {str(ve)}')
+        return None
