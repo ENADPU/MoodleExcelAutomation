@@ -48,13 +48,13 @@ def send_data_to_power_automate(studentid, courseid):
         formatted_data['course_fullname'] = course_name
 
         # URL do fluxo do Power Automate
-        url = "https://prod-156.westus.logic.azure.com:443/workflows/8fa0e58311ee4851becfbee9961be28c/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=yKx4jOCRoommJcBULJA8uLPcH8CLKZNCWCZnCFZaZOw"
+        url = config.POWER_AUTOMATE_URL
         headers = {
             "Content-Type": "application/json",
         }
 
         # Envia a requisição para o Power Automate
-        response = r.post(url, headers=headers, json=formatted_data)
+        response = r.post(str(url), headers=headers, json=formatted_data)
 
         if response.status_code == 200:
             print("Dados enviados com sucesso para o Power Automate.")

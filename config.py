@@ -8,6 +8,9 @@ load_dotenv()
 MOODLE_API_URL = os.getenv('MOODLE_API_URL')
 MOODLE_API_TOKEN = os.getenv('MOODLE_API_TOKEN')
 
+# Power Automate Configuration
+POWER_AUTOMATE_URL = os.getenv('POWER_AUTOMATE_URL')
+
 # Database Configuration
 DB_HOST = os.getenv('DB_HOST')
 DB_USER = os.getenv('DB_USER')
