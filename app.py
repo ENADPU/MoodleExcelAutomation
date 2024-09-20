@@ -3,6 +3,7 @@ import config
 import requests as r
 from get_data import get_user_data, get_course_data, format_data
 from events import user_enrolment_updated
+import os
 
 app = Flask(__name__)
 app.config['DEBUG'] = config.DEBUG
@@ -65,4 +66,5 @@ def send_data_to_power_automate(studentid, courseid):
         print(f"Erro ao enviar dados para o Power Automate: {str(e)}")
 
 if __name__ == '__main__':
-    app.run(port=config.PORT, debug=config.DEBUG)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
