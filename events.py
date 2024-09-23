@@ -32,9 +32,6 @@ def user_enrolment_updated(data):
         # Obtém os dados do estudante
         user_data = get_user_data(studentid)
         course_data = get_course_data(courseid)
-        
-        # Debug user_data
-        print(user_data)
 
         # Extrai o nome completo do estudante
         fullname = user_data.get('fullname')
