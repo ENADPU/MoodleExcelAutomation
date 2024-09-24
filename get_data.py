@@ -17,6 +17,7 @@ def get_user_data(userid):
 
         if 'users' in data and len(data['users']) > 0:
             user_data = data.get('users')[0]
+            print(f"User data: {user_data}")
             return extract_user_data(user_data)
         else:
             return f'Usuário com id={userid} não encontrado'
@@ -61,6 +62,13 @@ def extract_user_data(user_data):
             value = field.get('value', '')
 
             if field.get('type') == 'menu' or field.get('type') == 'text':
+                if 'nome_completo' in value:
+                    try:
+                        nome_completo_value = value.split('nome_completo:')[1].split('vinculo')[0]
+                        result[field['shortname']] = nome_completo_value
+                    except IndexError:
+                        result[field['shortname']] = "Valor não encontrado"
+
                 if '{mlang pt_br}' in value:
                     try:
                         pt_br_value = value.split('{mlang pt_br}')[1].split('{mlang')[0]
@@ -125,6 +133,7 @@ def format_data(data):
     # Montar os dados formatados
     formatted_data = {
         'username': cpf,
+        'fullname': data.get('fullname', ''),
         'nome_completo': formatted_name,
         'vinculo': vinculo_abbr,
         'uf': uf_abbr,
