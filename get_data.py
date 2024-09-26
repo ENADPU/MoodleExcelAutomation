@@ -86,7 +86,7 @@ def format_data(data):
     # Formatar Nome
     name = data.get('fullname', 'Nome Não Encontrado')
     name_parts = name.split()
-    prepositions = ['de', 'da', 'do', 'das', 'dos']
+    prepositions = ['de', 'da', 'do', 'das', 'dos', 'e']
     formatted_name = ' '.join([part.capitalize() if part.lower() not in prepositions else part.lower() for part in name_parts])
     
     municipio = data.get('municipio', 'Município Não Encontrado')

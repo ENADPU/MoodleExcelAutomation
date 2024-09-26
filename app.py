@@ -57,7 +57,7 @@ def send_data_to_power_automate(studentid, courseid):
         # Envia a requisição para o Power Automate
         response = r.post(str(url), headers=headers, json=formatted_data)
 
-        if response.status_code == 200:
+        if response.status_code == 202 or response.status_code == 200:
             print("Dados enviados com sucesso para o Power Automate.")
         else:
             print(f"Erro ao enviar dados: {response.status_code} - {response.text}")

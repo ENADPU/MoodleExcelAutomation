@@ -47,3 +47,4 @@ def user_enrolment_updated(data):
     except ValueError as ve:
         print(f'Erro ao processar dados do webhook: {str(ve)}')
         return None
+
