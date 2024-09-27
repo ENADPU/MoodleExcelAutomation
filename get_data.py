@@ -71,6 +71,10 @@ def extract_user_data(user_data):
                    result[field['shortname']] = value
             else:
                 result[field['shortname']] = value
+
+    nome_completo = result.get('nome_completo', '')
+    if not nome_completo or nome_completo.isdigit():
+        result['nome_completo'] = result.get('fullname', 'Nome Não Encontrado')
                                                                             
     return result
 
