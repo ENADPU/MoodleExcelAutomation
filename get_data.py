@@ -84,7 +84,7 @@ def format_data(data):
         cpf = "?"
 
     # Formatar Nome
-    name = data.get('fullname', 'Nome Não Encontrado')
+    name = data.get('nome_completo', 'Nome Não Encontrado')
     name_parts = name.split()
     prepositions = ['de', 'da', 'do', 'das', 'dos', 'e']
     formatted_name = ' '.join([part.capitalize() if part.lower() not in prepositions else part.lower() for part in name_parts])
@@ -121,7 +121,7 @@ def format_data(data):
     # Montar os dados formatados
     formatted_data = {
         'username': cpf,
-        'fullname': formatted_name,
+        'nome_completo': formatted_name,
         'vinculo': vinculo_abbr,
         'uf': uf_abbr,
         'genero': genero_abbr,

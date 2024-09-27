@@ -34,7 +34,7 @@ def user_enrolment_updated(data):
         course_data = get_course_data(courseid)
 
         # Extrai o nome completo do estudante
-        fullname = user_data.get('fullname')
+        fullname = user_data.get('nome_completo')
 
         # Valida os campos necessários
         if studentid is None or courseid is None:
