@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify
 import config
 import requests as r
 from get_data import get_user_data, get_course_data, format_data
-from events import user_enrolment_updated, user_enrolment_created
+from events import user_enrolment_updated 
 import os
 
 app = Flask(__name__)
@@ -27,9 +27,6 @@ def webhook():
             if studentid:
                 # Enviar dados para o Power Automate
                 send_data_to_power_automate(studentid, data.get('courseid'))
-        elif eventname == '\\core\\event\\user_enrolment_created':
-            # Quando a inscrição é criada, enviar dados para o Power Automate
-            studentid = user_enrolment_created(data)
 
         return jsonify({'status': 'success'}), 200
 
