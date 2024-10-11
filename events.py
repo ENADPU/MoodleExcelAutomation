@@ -14,8 +14,9 @@ def user_enrolment_created(data):
             user_name = user_data.get('nome_completo')
             print(jsonify(user_data))
             print(f'O estudante {user_name} foi inserido ao curso {course_name} manualmente')
-
-        return studentid
+            return studentid
+        else:
+            return 'Inscrição não manual'
 
     except ValueError as ve:
         print(f"Erro ao processar dados do webhook: {str(ve)}")
