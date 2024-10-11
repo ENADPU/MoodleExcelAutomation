@@ -10,6 +10,7 @@ MOODLE_API_TOKEN = os.getenv('MOODLE_API_TOKEN')
 
 # Power Automate Configuration
 POWER_AUTOMATE_URL = os.getenv('POWER_AUTOMATE_URL')
+POWER_AUTOMATE_URL_TESTE = os.getenv('POWER_AUTOMATE_URL_TESTE')
 
 # Database Configuration
 DB_HOST = os.getenv('DB_HOST')

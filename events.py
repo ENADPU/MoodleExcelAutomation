@@ -13,7 +13,7 @@ def user_enrolment_created(data):
         if enrol_type == 'manual':
             user_name = user_data.get('nome_completo')
             print(jsonify(user_data))
-            print(f'O estudante {user_name} foi inserido ao curso {course_name} manualmente')
+            print(f'O estudante {user_name} foi inserido ao curso {course_name} utilizando o método de inscrição manual')
             return studentid
         else:
             return 'Inscrição não manual'

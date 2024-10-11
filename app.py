@@ -58,7 +58,7 @@ def send_data_to_power_automate(studentid, courseid):
         formatted_data['course_fullname'] = course_name
 
         # URL do fluxo do Power Automate
-        url = config.POWER_AUTOMATE_URL
+        url = config.POWER_AUTOMATE_URL_TESTE
         headers = {
             "Content-Type": "application/json",
         }
