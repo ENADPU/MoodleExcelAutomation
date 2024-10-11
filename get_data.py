@@ -1,7 +1,17 @@
 from requests import request
+from cachetools import TTLCache
 import config
 
+# Cache para armazenar os dados dos usuários e cursos com TTL de 10 minutos
+user_cache = TTLCache(maxsize=1000, ttl=600)
+course_cache = TTLCache(maxsize=1000, ttl=600)
+
 def get_user_data(userid):
+    # Verifica se o usuário está no cache
+    if userid in user_cache:
+        return user_cache[userid]
+
+    # Faz requisição para a API do Moodle se não estiver no cache
     try:
         url = config.MOODLE_API_URL
         params = {
@@ -17,8 +27,9 @@ def get_user_data(userid):
 
         if 'users' in data and len(data['users']) > 0:
             user_data = data.get('users')[0]
-            print(f"User data: {user_data}")
-            return extract_user_data(user_data)
+            formatted_data = extract_user_data(user_data)
+            user_cache[userid] = formatted_data
+            return formatted_data
         else:
             return f'Usuário com id={userid} não encontrado'
 
@@ -26,6 +37,10 @@ def get_user_data(userid):
         return f'Erro de requisição: {str(ve)}'
 
 def get_course_data(courseid):
+    # Verifica se o curso está no cache
+    if courseid in course_cache:
+        return course_cache[courseid]
+
     try:
         url = config.MOODLE_API_URL
         params = {
@@ -37,8 +52,8 @@ def get_course_data(courseid):
 
         response = request("GET", str(url), params=params)
         data = response.json()[0]
-
         course_name = data.get('fullname')
+        course_cache[courseid] = course_name
 
         return course_name
 
