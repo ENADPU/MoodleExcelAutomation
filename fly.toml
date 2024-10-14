@@ -1,4 +1,4 @@
-# fly.toml app configuration file generated for excel-automation on 2024-10-12T12:01:40Z
+# fly.toml app configuration file generated for excel-automation on 2024-10-14T10:07:55-03:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
@@ -17,6 +17,6 @@ primary_region = 'gru'
   processes = ['app']
 
 [[vm]]
-  memory = '1gb'
+  memory = '512mb'
   cpu_kind = 'shared'
   cpus = 1
