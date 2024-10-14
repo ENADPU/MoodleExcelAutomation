@@ -36,6 +36,8 @@ def webhook():
                 print("Enviando dados para o Power Automate...")
                 # Enviar dados para o Power Automate
                 send_data_to_power_automate(userid, data.get('courseid'))
+            else:
+                print("Usuário não encontrado.")
 
         return jsonify({'status': 'success'}), 200
 
