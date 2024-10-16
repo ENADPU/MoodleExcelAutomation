@@ -1,4 +1,3 @@
-from flask import jsonify
 from get_data import get_user_data, get_course_data
 
 def user_enrolment_created(data):
@@ -8,15 +7,16 @@ def user_enrolment_created(data):
         courseid = data.get('courseid')
         enrol_type = data.get('other', {}).get('enrol')
         user_data = get_user_data(studentid)
-        course_name = get_course_data(courseid)
+        get_course_data(courseid)
 
         if enrol_type == 'manual':
-            user_name = user_data.get('nome_completo')
-            print(jsonify(user_data))
-            print(f'O estudante {user_name} foi inserido ao curso {course_name} manualmente')
+            user_data.get('nome_completo')
+            return studentid
+        elif enrol_type == 'self':
+            user_data.get('nome_completo')
             return studentid
         else:
-            return 'Inscrição não manual'
+            return None
 
     except ValueError as ve:
         print(f"Erro ao processar dados do webhook: {str(ve)}")
