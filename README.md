@@ -226,5 +226,5 @@ MIT License - veja [LICENSE](LICENSE) para detalhes.
 ---
 
 <p align="center">
-  <strong>🎯 Automatização simples que funciona</strong>
+  <strong>🎯 Simples que funciona</strong>
 </p>
