@@ -108,7 +108,7 @@ Como não temos licença Premium permanente, utilizamos o **trial de 90 dias** d
 
 Quando o trial expira:
 
-1. **Utilizar outra conta** Microsoft (Não funcioa a pessoal, tem que ser a empresarial)
+1. **Utilizar outra conta Microsoft** (Não funciona a pessoal, tem que ser a empresarial)
 2. **Ativar novo trial** Power Automate Premium  
 3. **Copiar fluxo** (mesmo processo abaixo)
 4. **Copiar nova URL** do gatilho HTTP
@@ -274,8 +274,8 @@ excel-automation/
 ### A cada 90 dias (renovação Power Automate):
 1. **Semana 12** do trial: Planejar migração
 2. **Semana 13** (últimos dias): 
-   - Criar nova conta Microsoft
-   - Configurar novo fluxo Power Automate  
+   - Escolher uma conta nova empresarial para utilizar (de algum colaborador)
+   - Configurar novo fluxo Power Automate
    - Testar em horário de baixo movimento
 3. **Dia da expiração**: 
    - Atualizar `POWER_AUTOMATE_URL`
