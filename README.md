@@ -32,36 +32,48 @@ graph LR
 ### Pré-requisitos
 - Conta no [Fly.io](https://fly.io) (gratuito)
 - [Flyctl](https://fly.io/docs/getting-started/installing-flyctl/) instalado
-- Power Automate configurado (veja [guia abaixo](#-configuração-do-power-automate))
+- Power Automate Premium (ou trial de 90 dias)
 
-### 1. Clone e Configure
+### 1. Clone e Configure (Caso for rodar localmente)
 
 ```bash
 git clone https://github.com/seu-usuario/excel-automation.git
 cd excel-automation
 cp .envexample .env
-# Edite o .env com suas configurações se quiser rodar localmente
+# Edite o .env com suas configurações
 ```
 
-### 2. Deploy no Fly.io
+### 2. Deploy no Fly.io (Se for a primeira vez, que não é o caso atual)
 
 ```bash
+# É importante salientar que as variáveis de ambiente já estão setadas no deploy feito no fly.io.
+# Faça esse passo apenas se estiver refazendo o deploy do zero ou migrando pra outra organização.
+# Também é possível setar as variáveis de ambiente diretamente pela plataforma online do fly.io.  
+
 # Login
 fly auth login
 
-# Deploy
-fly launch --no-deploy
-
-# Configure secrets
+# Configure secrets (primeira vez)
 fly secrets set MOODLE_API_TOKEN="seu_token_aqui"
 fly secrets set MOODLE_API_URL="https://seu-moodle.com/webservice/rest/server.php"
 fly secrets set POWER_AUTOMATE_URL="sua_url_do_power_automate"
 
-# Deploy final
+# Deploy
 fly deploy
 ```
 
 Pronto! Sua aplicação estará rodando em `https://sua-app.fly.dev`
+
+### 🔄 Atualizando Power Automate URL (Rotina a cada 90 dias)
+
+```bash
+# Atualizar apenas a URL do Power Automate
+# Também da pra fazer esse passo diretamente na plataforma do fly.io no seguinte caminho: https://fly.io/apps/excel-automation > Secrets.
+fly secrets set POWER_AUTOMATE_URL="nova_url_aqui"
+
+# Deploy para aplicar mudanças
+fly deploy
+```
 
 ## ⚙️ Configuração do Moodle
 
@@ -80,6 +92,32 @@ Em **Administração → Plugins → Web services → Gerenciar tokens**:
 - Serviço: "Moodle mobile web service"
 
 ## 🔄 Configuração do Power Automate
+
+> ⚠️ **IMPORTANTE**: Este sistema requer **Power Automate Premium** para funcionar, pois usa o conector webhook HTTP que não está disponível na versão gratuita.
+
+### 💡 **Contornando Limitação de Licença**
+
+Como não temos licença Premium permanente, utilizamos o **trial de 90 dias** do Power Automate:
+
+1. **Criar conta Microsoft** nova (ou usar existente sem trial usado)
+2. **Ativar trial Premium** do Power Automate (90 dias gratuitos)
+3. **Configurar fluxo** conforme instruções abaixo
+4. **A cada 90 dias**: migrar para nova conta e atualizar URL
+
+### 🔄 **Rotina de Renovação (A cada 3 meses)**
+
+Quando o trial expira:
+
+1. **Criar nova conta** Microsoft
+2. **Ativar novo trial** Power Automate Premium  
+3. **Recriar fluxo** (mesmo processo abaixo)
+4. **Copiar nova URL** do gatilho HTTP
+5. **Atualizar variável**:
+   ```bash
+   fly secrets set POWER_AUTOMATE_URL="nova_url_aqui"
+   fly deploy
+   ```
+6. **Testar** com inscrição no Moodle
 
 ### 1. Criar Fluxo
 1. **Gatilho**: "Quando uma solicitação HTTP é recebida"
@@ -157,10 +195,19 @@ curl https://sua-app.fly.dev/
 
 | Problema | Solução |
 |----------|---------|
-| Webhook não está chegando | Verifique URL e eventos no Moodle |
+| Webhook não está chegando | Verifique URL e eventos no Moodle (`/webhook`) |
 | Erro 401/403 | Verificar token da API do Moodle |
 | Dados não aparecem na planilha | Testar Power Automate manualmente |
 | App não responde | `fly logs` para ver erros |
+| **Power Automate trial expirou** | **Renovar trial e atualizar URL** |
+
+### ⚠️ **Erro "Power Automate Premium Required"**
+
+Se aparecer erro sobre licença Premium:
+
+1. ✅ **Trial expirou** - Renovar conforme [rotina acima](#-rotina-de-renovação-a-cada-3-meses)
+2. ✅ **Fluxo desabilitado** - Verificar se está ativo no Power Automate  
+3. ✅ **URL inválida** - Gerar nova URL do gatilho HTTP
 
 ### Teste Manual do Power Automate
 
@@ -180,6 +227,19 @@ curl -X POST "SUA_URL_DO_POWER_AUTOMATE" \
   }'
 ```
 
+### Debug Rápido
+
+```bash
+# Ver logs em tempo real
+fly logs
+
+# Status da aplicação  
+fly status
+
+# Testar se app responde
+curl https://sua-app.fly.dev/
+```
+
 ## 📊 Variáveis de Ambiente
 
 ```env
@@ -193,19 +253,39 @@ FLASK_DEBUG=False
 TIMEOUT=30
 ```
 
+> 💡 **Dica**: A `POWER_AUTOMATE_URL` muda a cada renovação de trial (90 dias). Mantenha o histórico das URLs antigas comentadas para referência.
+
 ## 📁 Estrutura do Projeto
 
 ```
 excel-automation/
-├── app.py              # App principal Flask
-├── config.py           # Configurações
-├── events.py           # Processamento de eventos
-├── get_data.py         # Busca e formatação de dados
-├── requirements.txt    # Dependências
-├── Dockerfile         # Container config
-├── fly.toml           # Config do Fly.io
+├── app.py              # App principal Flask - recebe webhooks
+├── config.py           # Configurações e variáveis de ambiente
+├── events.py           # Processamento de eventos do Moodle
+├── get_data.py         # Busca e formatação de dados via API
+├── requirements.txt    # Dependências Python
+├── Dockerfile         # Container config para Fly.io
+├── fly.toml           # Config de deploy do Fly.io
 └── .envexample        # Template de configuração
 ```
+
+## ⏰ Cronograma de Manutenção
+
+### A cada 90 dias (renovação Power Automate):
+1. **Semana 12** do trial: Planejar migração
+2. **Semana 13** (últimos dias): 
+   - Criar nova conta Microsoft
+   - Configurar novo fluxo Power Automate  
+   - Testar em horário de baixo movimento
+3. **Dia da expiração**: 
+   - Atualizar `POWER_AUTOMATE_URL`
+   - Deploy: `fly deploy`
+   - Monitorar logs por algumas horas
+
+### Backup e Contingência:
+- **Planilha Excel**: Backup manual semanal
+- **Configurações**: Manter documento com todos os steps
+- **URLs antigas**: Histórico comentado no .env para referência
 
 ## 🤝 Contribuição
 
@@ -226,5 +306,5 @@ MIT License - veja [LICENSE](LICENSE) para detalhes.
 ---
 
 <p align="center">
-  <strong>🎯 Simples que funciona</strong>
+  <strong>🎯 Automatização simples que funciona</strong>
 </p>
