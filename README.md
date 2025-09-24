@@ -1,114 +1,230 @@
-# 📡 Sistema de Monitoramento de Inscrições e Atualização de Planilhas
+# 📊 Automação de Planilhas Excel - Moodle Integration
 
-Este projeto consiste em um sistema que automatiza o monitoramento de inscrições de estudantes em cursos em uma plataforma Moodle e a atualização de dados em planilhas Excel armazenadas no SharePoint. Utilizando o Flask para receber webhooks do Moodle e o Power Automate para atualizar os dados nas planilhas, o sistema garante que todas as inscrições sejam processadas e documentadas de maneira eficiente.
+Sistema simples e eficiente que automatiza a transferência de dados de inscrições do Moodle para planilhas Excel no SharePoint, eliminando o trabalho manual de gestão de dados.
 
-## 🛠️ Funcionalidades
+## 🎯 O Problema que Resolve
 
-- 🔔 **Monitoramento de Inscrições:** Recebe notificações de inscrição e atualização de status diretamente do Moodle via webhook.
-- 📝 **Formatação de Dados:** Formata automaticamente os dados recebidos (CPF, nome, vínculo, etc.) antes de serem enviados para o Power Automate.
-- 📑 **Atualização de Planilhas:** Integração com o Power Automate para preencher e atualizar planilhas Excel no SharePoint com os dados formatados.
-- 📊 **Documentação Completa:** Documentação detalhada sobre como instalar, configurar e usar o sistema.
+- ✅ **Elimina trabalho manual**: Não precisa mais copiar/colar dados de estudantes
+- ✅ **Sincronização em tempo real**: Dados aparecem na planilha assim que o estudante se inscreve
+- ✅ **Formatação automática**: CPF, nomes e outros dados já chegam formatados
+- ✅ **Controle de indicadores**: Facilita relatórios de inscrições por curso
 
-## 🚀 Como Iniciar
+## 🔄 Como Funciona
 
-### 📚 Tecnologias Utilizadas
-- [Flask](https://flask.palletsprojects.com/)
-- [Power Automate](https://flow.microsoft.com/)
-- [Moodle Web Services](https://docs.moodle.org/dev/Web_services)
-- [SharePoint](https://www.microsoft.com/en-us/microsoft-365/sharepoint/collaboration)
+```mermaid
+graph LR
+    A[Moodle] -->|Webhook| B[Flask App]
+    B -->|Busca dados| C[Moodle API]
+    B -->|Formata dados| D[Dados Tratados]
+    D -->|Envia| E[Power Automate]
+    E -->|Atualiza| F[Excel SharePoint]
+```
 
-### 📦 Pré-requisitos
+**Fluxo detalhado:**
+1. Estudante se inscreve ou tem inscrição atualizada no Moodle
+2. Moodle envia webhook para nossa aplicação
+3. App busca dados completos do estudante via API
+4. Formata os dados (CPF: `123.456.789-00`, nomes capitalizados, etc.)
+5. Envia para Power Automate que atualiza a planilha
 
-- 🐍 **Python 3.8+** - [Download Python](https://www.python.org/downloads/)
-- 📋 **Conta no Heroku (opcional)** - Para deploy na nuvem.
-- 📊 **Power Automate** - Configurado para integração com SharePoint e Excel.
+## 🚀 Deploy Rápido
 
-### 🖥️ Instalação
+### Pré-requisitos
+- Conta no [Fly.io](https://fly.io) (gratuito)
+- [Flyctl](https://fly.io/docs/getting-started/installing-flyctl/) instalado
+- Power Automate configurado (veja [guia abaixo](#-configuração-do-power-automate))
 
-1. Clone o repositório:
-   ```bash
-   git clone https://github.com/seu-usuario/seu-repositorio.git
-   ```
-2. Acesse o diretório do projeto:
-   ```bash
-   cd seu-repositorio
-   ```
-3. Crie e ative o ambiente virtual:
-   ```bash
-   python -m venv venv
-   source venv/bin/activate # Linux/Mac
-   venv\Scripts\activate # Windows
-   ```
-4. Instale as dependências:
-   ```bash
-   pip install -r requirements.txt
-   ```
+### 1. Clone e Configure
 
-### ⚙️ Configuraçãoo
-
-1. Crie um arquivo .env na raiz do projeto com as seguintes variáveis de ambiente:
 ```bash
+git clone https://github.com/seu-usuario/excel-automation.git
+cd excel-automation
+cp .envexample .env
+# Edite o .env com suas configurações
+```
+
+### 2. Deploy no Fly.io
+
+```bash
+# Login
+fly auth login
+
+# Deploy
+fly launch --no-deploy
+
+# Configure secrets
+fly secrets set MOODLE_API_TOKEN="seu_token_aqui"
+fly secrets set MOODLE_API_URL="https://seu-moodle.com/webservice/rest/server.php"
+fly secrets set POWER_AUTOMATE_URL="sua_url_do_power_automate"
+
+# Deploy final
+fly deploy
+```
+
+Pronto! Sua aplicação estará rodando em `https://sua-app.fly.dev`
+
+## ⚙️ Configuração do Moodle
+
+### 1. Webhook
+Em **Administração → Plugins → Web services → Webhooks**:
+
+- **URL**: `https://sua-app.fly.dev/webhook`
+- **Eventos**: 
+  - `core\event\user_enrolment_created`
+  - `core\event\user_enrolment_updated`
+- **Formato**: JSON
+
+### 2. Token da API
+Em **Administração → Plugins → Web services → Gerenciar tokens**:
+- Criar novo token para usuário admin
+- Serviço: "Moodle mobile web service"
+
+## 🔄 Configuração do Power Automate
+
+### 1. Criar Fluxo
+1. **Gatilho**: "Quando uma solicitação HTTP é recebida"
+2. **Ação**: "Adicionar uma linha à tabela" (Excel Online)
+
+### 2. Esquema JSON do Gatilho
+```json
+{
+    "type": "object",
+    "properties": {
+        "username": {"type": "string"},
+        "nome_completo": {"type": "string"},
+        "vinculo": {"type": "string"},
+        "uf": {"type": "string"},
+        "genero": {"type": "string"},
+        "etinia": {"type": "string"},
+        "email": {"type": "string"},
+        "municipio": {"type": "string"},
+        "course_fullname": {"type": "string"}
+    }
+}
+```
+
+### 3. Mapeamento na Planilha
+| Coluna Excel | Campo do Power Automate |
+|--------------|-------------------------|
+| CPF | `triggerBody()?['username']` |
+| Nome | `triggerBody()?['nome_completo']` |
+| Vínculo | `triggerBody()?['vinculo']` |
+| UF | `triggerBody()?['uf']` |
+| Gênero | `triggerBody()?['genero']` |
+| Etnia | `triggerBody()?['etinia']` |
+| Email | `triggerBody()?['email']` |
+| Município | `triggerBody()?['municipio']` |
+| Curso | `triggerBody()?['course_fullname']` |
+
+## 📋 Estrutura da Planilha Excel
+
+Crie uma tabela no Excel Online com essas colunas:
+
+| CPF | Nome | Vínculo | UF | Gênero | Etnia | Email | Município | Curso |
+|-----|------|---------|----|---------|---------|---------|---------|---------| 
+| 123.456.789-00 | João Silva | S | SP | M | Branca | joao@email.com | São Paulo | Curso Python |
+
+## 🔍 Monitoramento
+
+### Verificar Status
+```bash
+# Status da aplicação
+fly status
+
+# Ver logs em tempo real
+fly logs
+
+# Health check
+curl https://sua-app.fly.dev/
+```
+
+### Campos Formatados Automaticamente
+
+**CPF**: `12345678900` → `123.456.789-00`
+
+**Nome**: `joão da silva` → `João da Silva`
+
+**Vínculo**: 
+- `Servidor / Empregado Público` → `S`
+- `Estagiário` → `E`
+- `Público Externo` → `P/Ext`
+
+**UF**: `São Paulo - SP` → `SP`
+
+**Gênero**: `Masculino` → `M`, `Feminino` → `F`
+
+## 🐛 Troubleshooting
+
+| Problema | Solução |
+|----------|---------|
+| Webhook não está chegando | Verifique URL e eventos no Moodle |
+| Erro 401/403 | Verificar token da API do Moodle |
+| Dados não aparecem na planilha | Testar Power Automate manualmente |
+| App não responde | `fly logs` para ver erros |
+
+### Teste Manual do Power Automate
+
+```bash
+curl -X POST "SUA_URL_DO_POWER_AUTOMATE" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "123.456.789-00",
+    "nome_completo": "João da Silva",
+    "vinculo": "S",
+    "uf": "SP",
+    "genero": "M",
+    "etinia": "Branca",
+    "email": "joao@teste.com",
+    "municipio": "São Paulo",
+    "course_fullname": "Curso de Teste"
+  }'
+```
+
+## 📊 Variáveis de Ambiente
+
+```env
+# Obrigatórias
 MOODLE_API_URL=https://seu-moodle.com/webservice/rest/server.php
-MOODLE_API_TOKEN=seu-token-de-acesso
-POWER_AUTOMATE_URL=https://seu-fluxo-de-automacao.com
-PORT=5000
-DEBUG=True
+MOODLE_API_TOKEN=seu_token_da_api
+POWER_AUTOMATE_URL=https://prod-XX.eastus.logic.azure.com:443/workflows/...
+
+# Opcionais
+FLASK_DEBUG=False
+TIMEOUT=30
 ```
 
-2. Certifique-se de que as URLs e tokens de acesso estão corretos e correspondem ao seu ambiente.
+## 📁 Estrutura do Projeto
 
-### 📊 Fluxo de Trabalho
-
-1. **Inscrição do estudante:** Quando a inscrição de um estudante é aceita em um curso, o Moodle envia um webhook para o servidor Flask.
-2. **Processamento do Webhook:** O Flask recebe o webhook, formata os dados e envia para o Power Automate.
-3. **Atualização da Planilha:** O Power Automate atualiza as planilhas Excel no SharePoint com os dados formatados.
-
-### 🧪 Testes
-
-- Execute testes unitários e de integração para garantir que tudo está funcionando conforme o esperado:
-```bash
-pytest tests/
+```
+excel-automation/
+├── app.py              # App principal Flask
+├── config.py           # Configurações
+├── events.py           # Processamento de eventos
+├── get_data.py         # Busca e formatação de dados
+├── requirements.txt    # Dependências
+├── Dockerfile         # Container config
+├── fly.toml           # Config do Fly.io
+└── .envexample        # Template de configuração
 ```
 
-### 🌐 Deploy
+## 🤝 Contribuição
 
-#### Heroku
-1. Faça login no Heroku:
-```bash
-heroku login
-```
+1. Fork o projeto
+2. Crie sua feature branch (`git checkout -b feature/nova-feature`)
+3. Commit suas mudanças (`git commit -m 'Add: nova feature'`)
+4. Push para a branch (`git push origin feature/nova-feature`)
+5. Abra um Pull Request
 
-2. Crie uma nova aplicação:
-```bash
-heroku create nome-da-sua-aplicacao
-```
+## 📄 Licença
 
-3. Faça o deploy do código:
-```bash
-git push heroku main
-```
+MIT License - veja [LICENSE](LICENSE) para detalhes.
 
-### Outros
-- Consulte a documentação da plataforma de nuvem de sua escolha (AWS, Google Cloud, Azure, etc.) para instruções de deploy.
+## 👨‍💻 Autor
 
-### 🤝 Contribuições
-1. Faça um fork do projeto.
-2. Crie uma nova branch com suas alterações:
-```bash
-git checkout -b feature/nova-funcionalidade
-```
-3. Faça commit das suas alterações:
-```bash
-git commit -m 'Adiciona nova funcionalidade'
-```
-4. Faça push para a branch criada:
-```bash
-git push origin feature/nova-funcionalidade
-```
-5. Abra um pull request.
+**Gustavo Barbosa** - [@Barbosa885](https://github.com/Barbosa885)
 
-### 📝 Licença
-Este projeto está licenciado sob a Licença MIT - consulte o arquivo [LICENSE](LICENSE) para mais detalhes.
+---
 
-### 🧑‍💻 Autor
-- **Gustavo Barbosa:** - [LinkedIn](https://www.linkedin.com/in/barbosa885/)
+<p align="center">
+  <strong>🎯 Automatização simples que funciona</strong>
+</p>
