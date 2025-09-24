@@ -99,7 +99,7 @@ Em **Administração → Plugins → Web services → Gerenciar tokens**:
 
 Como não temos licença Premium permanente, utilizamos o **trial de 90 dias** do Power Automate:
 
-1. **Criar conta Microsoft** nova (ou usar existente sem trial usado)
+1. **Usar conta Microsoft empresarial do domínio @dpu.def.br** nova (ou existente sem trial usado)
 2. **Ativar trial Premium** do Power Automate (90 dias gratuitos)
 3. **Configurar fluxo** conforme instruções abaixo
 4. **A cada 90 dias**: migrar para nova conta e atualizar URL
@@ -108,9 +108,9 @@ Como não temos licença Premium permanente, utilizamos o **trial de 90 dias** d
 
 Quando o trial expira:
 
-1. **Criar nova conta** Microsoft
+1. **Utilizar outra conta** Microsoft (Não funcioa a pessoal, tem que ser a empresarial)
 2. **Ativar novo trial** Power Automate Premium  
-3. **Recriar fluxo** (mesmo processo abaixo)
+3. **Copiar fluxo** (mesmo processo abaixo)
 4. **Copiar nova URL** do gatilho HTTP
 5. **Atualizar variável**:
    ```bash
