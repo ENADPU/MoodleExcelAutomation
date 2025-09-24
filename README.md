@@ -40,7 +40,7 @@ graph LR
 git clone https://github.com/seu-usuario/excel-automation.git
 cd excel-automation
 cp .envexample .env
-# Edite o .env com suas configurações
+# Edite o .env com suas configurações se quiser rodar localmente
 ```
 
 ### 2. Deploy no Fly.io
